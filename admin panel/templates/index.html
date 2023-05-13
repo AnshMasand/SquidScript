@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+</head>
+<body>
+    <h1>Proxy Configuration</h1>
+    <form action="/configure" method="post">
+        <label for="target_url">Target URL:</label>
+        <input type="text" id="target_url" name="target_url" required>
+        <br>
+        <label for="config">Squid Configuration:</label>
+        <textarea id="config" name="config" rows="10" cols="50" required></textarea>
+        <br>
+        <input type="submit" value="Configure">
+    </form>
+</body>
+</html>
