@@ -5,12 +5,16 @@ Install Ansible on your local machine. You can download the latest version of An
 Step 2: 
 Update inventory.ini with the IP address of all your machines
 
-Step 3: 
+Step 3:
+Change the port number in the deploy_agent.yml file
+
+Step 4: 
 Run the ansible playbook using
   ansible-playbook -i inventory.ini deploy_agent.yml
 
 This configuration sets up Squid to listen on port 3128, allows access from the local network, and denies access from all other sources. 
 Change your configuration at the squid.conf file. 
+
 
 TO RUN THE ADMIN GUI:
 Step 1: 
