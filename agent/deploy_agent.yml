@@ -1,25 +1,41 @@
-  ---
-   - name: Deploy Squid proxy agent
-     hosts: target_machines
-     become: true
-     tasks:
-       - name: Install Python
-         raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
-       - name: Install Flask
-         pip:
-           name: flask
-       - name: Install Squid
-         apt:
-           name: squid
-           state: present
-       - name: Copy agent script
-         copy:
-           src: agent.py
-           dest: /opt/agent.py
-       - name: Configure Squid proxy
-         uri:
-           url: http://localhost:5001/configure
-           method: POST
-           body_format: form-urlencoded
-           body:
-             config: "{{ lookup('file', 'squid.conf') }}"
+---
+- name: Deploy Squid proxy agent
+  hosts: target_machines
+  become: true
+  tasks:
+    - name: Install Python
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+      
+    - name: Install Flask
+      pip:
+        name: flask
+        
+    - name: Install Squid
+      apt:
+        name: squid
+        state: present
+        
+    - name: Copy agent script
+      copy:
+        src: agent.py
+        dest: /opt/agent.py
+        
+    - name: Configure Squid proxy
+      uri:
+        url: http://localhost:5001/configure
+        method: POST
+        body_format: form-urlencoded
+        body:
+          config: "{{ lookup('file', 'squid.conf') }}"
+          
+    - name: Install ufw package
+      apt:
+        name: ufw
+        state: present
+        
+    - name: Open port for Squid proxy configuration
+      ufw:
+        rule: allow
+        port: 5001
+        proto: tcp
+        state: enabled
