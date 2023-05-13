@@ -66,3 +66,23 @@
         action: allow
         protocol: TCP
       when: ansible_facts['ansible_system'] == 'Windows'
+
+    - name: Start Squid service on Linux
+      service:
+        name: squid
+        state: started
+        enabled: yes
+      when: ansible_facts['ansible_system'] == 'Linux'
+
+    - name: Start Squid service on Windows
+      win_service:
+        name: squid
+        start_mode: auto
+        state: started
+      when: ansible_facts['ansible_system'] == 'Windows'
+
+    - name: Run agent script
+      command: python /opt/agent.py
+      args:
+        chdir: /opt
+      when: ansible_facts['ansible_system'] == 'Linux'
