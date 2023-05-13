@@ -3,22 +3,44 @@
   hosts: target_machines
   become: true
   tasks:
-    - name: Install Python
+    - name: Install Python on Linux
       raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+      when: ansible_facts['ansible_system'] == 'Linux'
+      
+    - name: Install Python on Windows
+      win_chocolatey:
+        name: python
+        state: present
+      when: ansible_facts['ansible_system'] == 'Windows'
       
     - name: Install Flask
       pip:
         name: flask
+      when: ansible_facts['ansible_system'] == 'Linux'
         
-    - name: Install Squid
+    - name: Install Squid on Linux
       apt:
         name: squid
         state: present
+      when: ansible_facts['ansible_system'] == 'Linux'
+        
+    - name: Install Squid on Windows
+      win_chocolatey:
+        name: squid
+        state: present
+      when: ansible_facts['ansible_system'] == 'Windows'
         
     - name: Copy agent script
       copy:
         src: agent.py
         dest: /opt/agent.py
+      when: ansible_facts['ansible_system'] == 'Linux' 
+        
+    - name: Copy agent script on Windows
+      win_copy:
+        src: agent.py
+        dest: C:\agent.py
+      when: ansible_facts['ansible_system'] == 'Windows'
         
     - name: Configure Squid proxy
       uri:
@@ -27,15 +49,20 @@
         body_format: form-urlencoded
         body:
           config: "{{ lookup('file', 'squid.conf') }}"
+      when: ansible_facts['ansible_system'] == 'Linux'
           
-    - name: Install ufw package
-      apt:
-        name: ufw
-        state: present
-        
-    - name: Open port for Squid proxy configuration
+    - name: Open port for Squid proxy configuration on Linux
       ufw:
         rule: allow
         port: 5001
         proto: tcp
         state: enabled
+      when: ansible_facts['ansible_system'] == 'Linux'
+      
+    - name: Open port for Squid proxy configuration on Windows
+      win_firewall_rule:
+        name: Allow Squid Proxy Configuration
+        localport: 5001
+        action: allow
+        protocol: TCP
+      when: ansible_facts['ansible_system'] == 'Windows'
